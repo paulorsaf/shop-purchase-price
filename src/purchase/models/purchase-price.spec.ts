@@ -34,6 +34,7 @@ describe('Purchase price', () => {
             deliveryPrice: 0,
             discount: 0,
             paymentFee: 0,
+            serviceFee: 0,
             totalPrice: 0,
             totalWithPaymentFee: 0
         });
@@ -47,13 +48,13 @@ describe('Purchase price', () => {
             purchasePrice = new PurchasePrice({products} as any);
         });
 
-        it('given products, when there are no discounts, then return full products price', async () => {
+        it('given there are no discounts, then return full products price', async () => {
             const response = await purchasePrice.calculatePrice();
             
             expect(response.productsPrice).toEqual(100);
         })
     
-        it('given products, when there are discounts, then return products price with discount', async () => {
+        it('given there are discounts, then return products price with discount', async () => {
             products[1].priceWithDiscount = 5;
 
             const response = await purchasePrice.calculatePrice();
@@ -100,28 +101,40 @@ describe('Purchase price', () => {
             purchasePrice = new PurchasePrice({
                 addresses,
                 products,
+                serviceFee: 10
             } as any, mailMock);
         });
 
-        it('given purchase is not delivery, then total price should be equal to products price', async () => {
+        it('given purchase is not delivery, then total price should be equal to products price plus service fee', async () => {
             addresses.destination = undefined;
 
             const response = await purchasePrice.calculatePrice();
 
-            expect(response.totalPrice).toEqual(100);
+            expect(response.totalPrice).toEqual(110);
         })
 
-        it('given purchase is delivery, then total price should be equal to products plus delivery price', async () => {
+        it('given purchase is delivery, then total price should be equal to products plus delivery price plus service fee', async () => {
             mailMock._findDeliveryPriceResponse = 20;
 
             const response = await purchasePrice.calculatePrice();
             
-            expect(response.totalPrice).toEqual(120);
+            expect(response.totalPrice).toEqual(130);
         })
 
         it('given purchase has discount, then total price should have discount', async () => {
             purchasePrice = new PurchasePrice({
-                addresses, discount: 10, products,
+                addresses, discount: 10, products, serviceFee: 10
+            } as any, mailMock);
+            mailMock._findDeliveryPriceResponse = 20;
+
+            const response = await purchasePrice.calculatePrice();
+            
+            expect(response.totalPrice).toEqual(118);
+        })
+
+        it('given purchase doesnt have service fee, then total price should not add service fee', async () => {
+            purchasePrice = new PurchasePrice({
+                addresses, discount: 10, products, serviceFee: 0
             } as any, mailMock);
             mailMock._findDeliveryPriceResponse = 20;
 
@@ -211,11 +224,27 @@ describe('Purchase price', () => {
             expect(response.totalWithPaymentFee).toEqual(100);
         })
 
+        it('given purchase has payment fee and service fee, then return total price with payment fee and service fee', async () => {
+            purchasePrice = new PurchasePrice({
+                paymentFee,
+                products,
+                serviceFee: 10
+            } as any);
+
+            const response = await purchasePrice.calculatePrice();
+
+            expect(response.totalWithPaymentFee).toEqual(122.5);
+        })
+
     })
 
-    it('given purchase has products, discount, payment fee and is delivery, then return whole purchase price', async() => {
+    it('given purchase has products, discount, payment fee, service fee and is delivery, then return whole purchase price', async() => {
         const purchasePrice = new PurchasePrice({
-            products, addresses, discount: 10, paymentFee
+            products,
+            addresses,
+            discount: 10,
+            paymentFee,
+            serviceFee: 10
         } as any, mailMock);
         mailMock._findDeliveryPriceResponse = 20;
 
@@ -226,8 +255,9 @@ describe('Purchase price', () => {
             deliveryPrice: 20,
             discount: 12,
             paymentFee: 14.5,
-            totalPrice: 108,
-            totalWithPaymentFee: 122.5
+            serviceFee: 10,
+            totalPrice: 118,
+            totalWithPaymentFee: 132.5
         });
     })
 

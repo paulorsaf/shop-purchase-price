@@ -1,4 +1,4 @@
-import { calcularPrecoPrazo, PrecoPrazoResponse } from "correios-brasil/dist";
+import { calcularPrecoPrazo, CepResponse, PrecoPrazoResponse } from "correios-brasil/dist";
 import { consultarCep } from "correios-brasil/dist";
 import { ProductAmountWeight } from "../../types/product-type";
 import { Address } from "../types/address.type";
@@ -8,14 +8,14 @@ import { MailInterfaceRepository } from "./mail.repository.interface";
 export class MailRepository implements MailInterfaceRepository {
     
     async findByZipCode(zipCode: string): Promise<Address> {
-        return consultarCep(zipCode.replace(/[^\d]/g, '')).then((response: any) => {
+        return consultarCep(zipCode.replace(/[^\d]/g, '')).then((response: CepResponse) => {
             return {
-                city: response.data.localidade,
-                complement: response.data.complemento,
-                neighborhood: response.data.bairro,
-                state: response.data.uf,
-                street: response.data.logradouro,
-                zipCode: response.data.cep
+                city: response.localidade,
+                complement: response.complemento,
+                neighborhood: response.bairro,
+                state: response.uf,
+                street: response.logradouro,
+                zipCode: response.cep
             }
         });
     }
@@ -35,7 +35,7 @@ export class MailRepository implements MailInterfaceRepository {
             nVlDiametro: '0',
         };
           
-        return calcularPrecoPrazo(args).then((response: PrecoPrazoResponse) => {
+        return calcularPrecoPrazo(args).then((response: PrecoPrazoResponse[]) => {
             return parseFloat(response[0].Valor.replace(',', '.'));
         });
     }

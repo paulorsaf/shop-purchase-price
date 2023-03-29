@@ -17,6 +17,7 @@ export class PurchasePrice {
             return this.createEmptyPurchasePriceResponse();
         }
 
+        const serviceFee = this.dto.serviceFee || 0;
         const productsPrice = this.calculateProductsPrice();
         const deliveryPrice = await this.calculateDeliveryPrice();
         const {totalPrice, discount} =
@@ -28,8 +29,9 @@ export class PurchasePrice {
             deliveryPrice,
             discount,
             paymentFee,
-            totalPrice,
-            totalWithPaymentFee: totalPrice + paymentFee
+            serviceFee,
+            totalPrice: totalPrice + serviceFee,
+            totalWithPaymentFee: totalPrice + paymentFee + serviceFee
         };
     }
 
@@ -83,6 +85,7 @@ export class PurchasePrice {
             deliveryPrice: 0,
             discount: 0,
             paymentFee: 0,
+            serviceFee: 0,
             totalPrice: 0,
             totalWithPaymentFee: 0
         };
@@ -91,8 +94,8 @@ export class PurchasePrice {
 }
 
 type ProductAndDeliveryPrice = {
-    productsPrice: number;
     deliveryPrice: number;
+    productsPrice: number;
 }
 
 type TotalPriceAndDiscount = {

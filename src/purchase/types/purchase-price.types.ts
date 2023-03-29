@@ -8,6 +8,7 @@ export type PurchasePriceDTO = {
     discount: number;
     paymentFee: PaymentFee;
     products: Product[];
+    serviceFee: number;
 }
 
 export type PaymentFee = {
@@ -20,6 +21,7 @@ export type PurchasePriceResponse = {
     deliveryPrice: number;
     discount: number;
     paymentFee: number;
+    serviceFee: number;
     totalPrice: number;
     totalWithPaymentFee: number;
 }

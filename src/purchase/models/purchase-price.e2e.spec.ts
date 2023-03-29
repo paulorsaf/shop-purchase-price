@@ -27,7 +27,8 @@ describe('Purchase price e2e', () => {
                 amount: 2,
                 price: 20,
                 weight: 0.5
-            }]
+            }],
+            serviceFee: 10
         }
     })
 
@@ -43,6 +44,7 @@ describe('Purchase price e2e', () => {
             deliveryPrice: 0,
             discount: 0,
             paymentFee: 0,
+            serviceFee: 0,
             totalPrice: 0,
             totalWithPaymentFee: 0
         });
@@ -58,8 +60,9 @@ describe('Purchase price e2e', () => {
             deliveryPrice: 10,
             discount: 11,
             paymentFee: 5.8,
-            totalPrice: 99,
-            totalWithPaymentFee: 104.8
+            serviceFee: 10,
+            totalPrice: 109,
+            totalWithPaymentFee: 114.8
         });
     })
 
@@ -74,8 +77,9 @@ describe('Purchase price e2e', () => {
             deliveryPrice: 96,
             discount: 19.6,
             paymentFee: 8.38,
-            totalPrice: 176.4,
-            totalWithPaymentFee: 184.78
+            serviceFee: 10,
+            totalPrice: 186.4,
+            totalWithPaymentFee: 194.78
         });
     })
 

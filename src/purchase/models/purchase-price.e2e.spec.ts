@@ -13,6 +13,7 @@ describe('Purchase price e2e', () => {
                 destination: '60510-290'
             },
             discount: 10,
+            hasDeliveryByMail: true,
             innerCityDeliveryPrice: 10,
             originCityName: 'Fortaleza',
             paymentFee: {

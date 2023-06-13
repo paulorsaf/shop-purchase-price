@@ -70,6 +70,7 @@ describe('Purchase price', () => {
 
         beforeEach(() => {
             purchasePrice = new PurchasePrice({
+                hasDeliveryByMail: true,
                 addresses,
                 products,
             } as any, mailMock);
@@ -83,12 +84,38 @@ describe('Purchase price', () => {
             expect(response.deliveryPrice).toEqual(0);
         })
 
-        it('given purchase is delivery, then return delivery price', async () => {
-            mailMock._findDeliveryPriceResponse = 20;
+        describe('given purchase is delivery', () => {
 
-            const response = await purchasePrice.calculatePrice();
-            
-            expect(response.deliveryPrice).toEqual(20);
+            let dto;
+
+            beforeEach(() => {
+                dto = {
+                    addresses,
+                    products,
+                    innerCityDeliveryPrice: 10,
+                    hasDeliveryByMail: true
+                };
+                mailMock._findDeliveryPriceResponse = 20;
+            })
+
+            it('when has delivery by mail, then return delivery price', async () => {
+                dto.hasDeliveryByMail = true;
+                purchasePrice = new PurchasePrice(dto, mailMock);
+
+                const response = await purchasePrice.calculatePrice();
+                
+                expect(response.deliveryPrice).toEqual(20);
+            })
+
+            it('when doesnt have delivery by mail, then return inner city delivery price', async () => {
+                dto.hasDeliveryByMail = false;
+                purchasePrice = new PurchasePrice(dto, mailMock);
+
+                const response = await purchasePrice.calculatePrice();
+                
+                expect(response.deliveryPrice).toEqual(10);
+            })
+
         })
 
     })
@@ -100,6 +127,7 @@ describe('Purchase price', () => {
         beforeEach(() => {
             purchasePrice = new PurchasePrice({
                 addresses,
+                hasDeliveryByMail: true,
                 products,
                 serviceFee: 10
             } as any, mailMock);
@@ -123,7 +151,11 @@ describe('Purchase price', () => {
 
         it('given purchase has discount, then total price should have discount', async () => {
             purchasePrice = new PurchasePrice({
-                addresses, discount: 10, products, serviceFee: 10
+                addresses,
+                discount: 10,
+                hasDeliveryByMail: true,
+                products,
+                serviceFee: 10
             } as any, mailMock);
             mailMock._findDeliveryPriceResponse = 20;
 
@@ -134,7 +166,11 @@ describe('Purchase price', () => {
 
         it('given purchase doesnt have service fee, then total price should not add service fee', async () => {
             purchasePrice = new PurchasePrice({
-                addresses, discount: 10, products, serviceFee: 0
+                addresses,
+                discount: 10,
+                hasDeliveryByMail: true,
+                products,
+                serviceFee: 0
             } as any, mailMock);
             mailMock._findDeliveryPriceResponse = 20;
 
@@ -243,6 +279,7 @@ describe('Purchase price', () => {
             products,
             addresses,
             discount: 10,
+            hasDeliveryByMail: true,
             paymentFee,
             serviceFee: 10
         } as any, mailMock);

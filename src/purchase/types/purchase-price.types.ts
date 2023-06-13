@@ -6,6 +6,7 @@ export type PurchasePriceDTO = {
     innerCityDeliveryPrice: number;
     originCityName: string;
     discount: number;
+    hasDeliveryByMail: boolean;
     paymentFee: PaymentFee;
     products: Product[];
     serviceFee: number;

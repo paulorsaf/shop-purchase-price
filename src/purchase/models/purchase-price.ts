@@ -60,15 +60,19 @@ export class PurchasePrice {
     private async calculateDeliveryPrice() {
         let deliveryPrice = 0;
         if (this.dto.addresses?.destination) {
-            deliveryPrice = await this.mail!.findDeliveryPrice({
-                innerCityDeliveryPrice: this.dto.innerCityDeliveryPrice,
-                originCityName: this.dto.originCityName,
-                products: this.dto.products.map(p => ({
-                    amount: p.amount,
-                    weight: p.weight
-                })),
-                zipCodes: this.dto.addresses
-            });
+            if (this.dto.hasDeliveryByMail) {
+                deliveryPrice = await this.mail!.findDeliveryPrice({
+                    innerCityDeliveryPrice: this.dto.innerCityDeliveryPrice,
+                    originCityName: this.dto.originCityName,
+                    products: this.dto.products.map(p => ({
+                        amount: p.amount,
+                        weight: p.weight
+                    })),
+                    zipCodes: this.dto.addresses
+                });
+            } else {
+                deliveryPrice = this.dto.innerCityDeliveryPrice;
+            }
         }
         return deliveryPrice;
     }
